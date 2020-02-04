@@ -13,7 +13,6 @@ const options = {
     json: true // Automatically parses the JSON string in the response
 };
 
-
 rp(options)
     .then(function (response) {
         let json = response;
