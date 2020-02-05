@@ -32,8 +32,8 @@ class team {
     }
 
     drawBound() {
-        display.beginPath();
         display.moveTo(this.x[0], this.y[0]);
+        display.beginPath();
         for (let i = 1; i < this.y.length; i++) {
             display.lineTo(this.x[i] * constant, this.y[i] * constant)
         }
@@ -84,8 +84,16 @@ class team {
     }
 }
 
+function inBoundary(team1, team2, time, distance) {
+    return ((((team1.x[time] - team2.x[time]) ** 2 + (team1.y[time] - team2.y[time]) ** 2) < distance) && !(((team1.x[time - 1] - team2.x[time - 1]) ** 2 + (team1.y[time - 1] - team2.y[time - 1]) ** 2) < distance));
+}
+
 function inContactBoundary(team1, team2, time) {
-    return ((((team1.x[time] - team2.x[time]) ** 2 + (team1.y[time] - team2.y[time]) ** 2) < 6.25) && !(((team1.x[time -1] - team2.x[time -1]) ** 2 + (team1.y[time -1] - team2.y[time -1]) ** 2) < 6.25));
+    return inBoundary(team1, team2, time, 6.5);
+}
+
+function inTightBoundary() {
+
 }
 
 function getMin(array) {
@@ -125,11 +133,6 @@ let teams = [
 ];
 
 team0.draw();
-
-// for (let i = 0; i < teams.length; i++) {
-//     teams[i].draw();
-// }
-
 
 document.getElementById("teamNumber").innerHTML = team0.number;
 
