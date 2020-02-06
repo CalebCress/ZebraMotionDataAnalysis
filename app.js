@@ -29,6 +29,11 @@ class team {
             // }
         }
         this.isBlue = isBlue;
+        if (this.isBlue){
+            this.teamVal = 3;
+        } else {
+            this.teamVal = 0
+        }
     }
 
     drawBound() {
@@ -68,32 +73,49 @@ class team {
 
     getTotalContacts() {
         this.contacts = 0;
-        if (this.isBlue){
-            this.teamVal = 3;
-        } else {
-            this.teamVal = 0
-        }
         for (let team = this.teamVal; team < this.teamVal + 3; team++) {
             for (let i = 0; i < this.x.length; i++) {
-                if (inContactBoundary(this, teams[team], i)){
+                if (inContactBoundary(this, teams[team], i) && !inContactBoundary(this, teams[team], i-1)){
                     this.contacts ++;
                 }
             }
         }
         return this.contacts;
     }
+
+    getContactPercentage() {
+        for (let team = this.teamVal; team < this.teamVal + 3; team++) {
+            for (let i = 0; i < this.x.length; i++) {
+                if (inContactBoundary(this, teams[team], i) && !inContactBoundary(this, teams[team], i-1)){
+                    this.contacts ++;
+                }
+            }
+        }
+    }
 }
 
 function inBoundary(team1, team2, time, distance) {
-    return ((((team1.x[time] - team2.x[time]) ** 2 + (team1.y[time] - team2.y[time]) ** 2) < distance) && !(((team1.x[time - 1] - team2.x[time - 1]) ** 2 + (team1.y[time - 1] - team2.y[time - 1]) ** 2) < distance));
+    return (((team1.x[time] - team2.x[time]) ** 2 + (team1.y[time] - team2.y[time]) ** 2) < distance ** 2);
 }
 
 function inContactBoundary(team1, team2, time) {
-    return inBoundary(team1, team2, time, 6.5);
+    return inBoundary(team1, team2, time, 3.5);
 }
 
-function inTightBoundary() {
+function inTightBoundary(team1, team2, time) {
+    return inBoundary(team1, team2, time, 6.5)
+}
 
+function inLooseBoundary(team1, team2, time) {
+    return inBoundary(team1, team2, time, 10)
+}
+
+function inGeneralBoundary(team1, team2, time) {
+    if (team1.x[0] < 25){
+        return ((team1.x[time] < 25) && !(team1.x[time] < 25))
+    } else {
+        return ((team1.x[time] < 25) && !(team1.x[time] < 25))
+    }
 }
 
 function getMin(array) {
