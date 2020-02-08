@@ -5,6 +5,11 @@ const display = document.getElementById("display").getContext("2d");
 let heatmap = document.getElementById("heatmap");
 let heat = simpleheat(heatmap);
 
+const contactBoundary = 3.5;
+const tightBoundary = 6.5;
+const looseBoundary = 10;
+const generalBoundary = "generalBoundary";
+
 if (json["alliances"]["blue"]["0"]["xs"][0] > 25) {
     document.getElementById("display").style.backgroundImage = "url('gameFieldFlip.png')";
     document.getElementById("heatmap").style.backgroundImage = "url('gameFieldFlip.png')";
@@ -71,43 +76,55 @@ class team {
         this.drawStart();
     }
 
-    getTotalContacts() {
+    getTotal(boundary) {
         this.contacts = 0;
-        for (let team = this.teamVal; team < this.teamVal + 3; team++) {
-            for (let i = 0; i < this.x.length; i++) {
-                if (inContactBoundary(this, teams[team], i) && !inContactBoundary(this, teams[team], i-1)){
-                    this.contacts ++;
+        if (boundary === generalBoundary) {
+            for (let team = this.teamVal; team < this.teamVal + 3; team++) {
+                for (let i = 0; i < this.x.length; i++) {
+                    if (inGeneralBoundary(this, teams[team], i) && !(inGeneralBoundary(this, teams[team], i-1))){
+                            this.contacts++;
+                    }
+                }
+            }
+        } else {
+            for (let team = this.teamVal; team < this.teamVal + 3; team++) {
+                for (let i = 0; i < this.x.length; i++) {
+                    if (inBoundary(this, teams[team], i, boundary)){
+                        this.contacts++;
+                    }
                 }
             }
         }
         return this.contacts;
     }
 
-    getContactPercentage() {
-        for (let team = this.teamVal; team < this.teamVal + 3; team++) {
-            for (let i = 0; i < this.x.length; i++) {
-                if (inContactBoundary(this, teams[team], i) && !inContactBoundary(this, teams[team], i-1)){
-                    this.contacts ++;
+    getPercentage(boundary) {
+        this.contacts = 0;
+        if (boundary === generalBoundary) {
+            for (let team = this.teamVal; team < this.teamVal + 3; team++) {
+                for (let i = 0; i < this.x.length; i++) {
+                    if (inGeneralBoundary(this, teams[team], i) && !(inGeneralBoundary(this, teams[team], i-1))){
+                            this.contacts++;
+                    }
+                }
+            }
+        } else {
+            for (let team = this.teamVal; team < this.teamVal + 3; team++) {
+                for (let i = 0; i < this.x.length; i++) {
+                    if (inBoundary(this, teams[team], i, boundary)){
+                        this.contacts++;
+                    }
                 }
             }
         }
+        return Math.round(this.contacts/this.x.length * 100);
     }
+
+
 }
 
 function inBoundary(team1, team2, time, distance) {
     return (((team1.x[time] - team2.x[time]) ** 2 + (team1.y[time] - team2.y[time]) ** 2) < distance ** 2);
-}
-
-function inContactBoundary(team1, team2, time) {
-    return inBoundary(team1, team2, time, 3.5);
-}
-
-function inTightBoundary(team1, team2, time) {
-    return inBoundary(team1, team2, time, 6.5)
-}
-
-function inLooseBoundary(team1, team2, time) {
-    return inBoundary(team1, team2, time, 10)
 }
 
 function inGeneralBoundary(team1, team2, time) {
@@ -138,12 +155,12 @@ function getMax(array) {
     return maximum;
 }
 
-let team0 = new team(json["alliances"]["blue"]["0"], "rgba(0,107,112, 1)", true);
-let team1 = new team(json["alliances"]["blue"]["1"], "rgba(0,38,112,1)", true);
-let team2 = new team(json["alliances"]["blue"]["2"], "rgba(15,0,112,1)", true);
-let team3 = new team(json["alliances"]["red"]["0"], "rgba(255,72,154,1)", false);
-let team4 = new team(json["alliances"]["red"]["1"], "rgba(255,18,0,1)", false);
-let team5 = new team(json["alliances"]["red"]["2"], "rgba(255,128,0,1)", false);
+let team0 = new team(json["alliances"]["blue"]["0"], "rgb(0,107,112)", true);
+let team1 = new team(json["alliances"]["blue"]["1"], "rgb(0,38,112)", true);
+let team2 = new team(json["alliances"]["blue"]["2"], "rgb(15,0,112)", true);
+let team3 = new team(json["alliances"]["red"]["0"], "rgb(255,72,154)", false);
+let team4 = new team(json["alliances"]["red"]["1"], "rgb(255,18,0)", false);
+let team5 = new team(json["alliances"]["red"]["2"], "rgb(255,128,0)", false);
 
 let teams = [
     team0,
@@ -160,4 +177,4 @@ document.getElementById("teamNumber").innerHTML = team0.number;
 
 console.log(json);
 
-document.getElementById("contact").innerHTML = team0.getTotalContacts();
+document.getElementById("contact").innerHTML = team0.getPercentage(contactBoundary);
